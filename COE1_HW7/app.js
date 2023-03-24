@@ -1,223 +1,380 @@
-
-let sortFlags = {
-    name: 'ascending',
-    area: 'ascending',
-};
-let displayedItems = [];
+/* eslint-disable no-magic-numbers */
 
 const appRoot = document.getElementById('app-root');
+appRoot.classList.add('container');
 
-let heading=document.createElement('h1');
-heading.innerHTML='Contries Search';
-appRoot.append(heading);
+ //creating h1, form element and appending to appRoot
+const form = document.createElement('form');
+const br = document.createElement('br');
+const h1 = document.createElement('h1');
+h1.innerText = 'Countries Search';
+appRoot.appendChild(h1);
 
-let div1=document.createElement('div');
-div1.setAttribute('class','container');
-appRoot.append(div1);
+const label = document.createElement('label');
+label.innerText = 'Please choose type of serach:';
 
-let div2=document.createElement('div');
-div2.setAttribute('class','filters');
-div1.append(div2);
 
-let div3=document.createElement('div');
-div3.setAttribute('class','filter-picker');
-div2.append(div3);
+appRoot.appendChild(form);
 
-let para1=document.createElement('p');
-para1.innerHTML='Please choose type of search:';
-para1.setAttribute('id','para1');
-div3.append(para1);
+ //creating radio button for region and appending to div
+const radioRegion = document.createElement('input');
+const radioLabel = document.createElement('label');
+radioLabel.innerHTML = 'By region<br/>';
+radioRegion.type = 'radio';
+radioRegion.name = 'search';
+radioRegion.id = 'region';
+radioRegion.value = 'region';
 
-let div5=document.createElement('div');
-div5.setAttribute('id','div5');
-div3.append(div5);
+const div=document.createElement('div');
+div.id='radios'
+form.appendChild(div);
+div.appendChild(label)
 
-let radioInput1=document.createElement('input');
-radioInput1.setAttribute('type','radio');
-radioInput1.setAttribute('name','search');
-radioInput1.setAttribute('value','region');
-radioInput1.setAttribute('id','regionSearch');
-radioInput1.setAttribute('onclick','handle(value)');
-div5.append(radioInput1);
+div.appendChild(radioRegion);
+div.appendChild(radioLabel);
 
-let label1=document.createElement('label');
-label1.innerHTML='By Region';
-label1.setAttribute('for','regionSearch');
-label1.setAttribute('class','region');
-div5.append(label1);
+ //creating radio button for language and appending to div
+const languageRegion = document.createElement('input');
+const languageLabel = document.createElement('label');
+languageLabel.innerText = 'By Language';
+languageRegion.setAttribute('name', 'search');
+languageRegion.setAttribute('type', 'radio');
+languageRegion.setAttribute('id', 'language');
+languageRegion.setAttribute('value', 'language');
 
-let radioInput2=document.createElement('input');
-radioInput2.setAttribute('type','radio');
-radioInput2.setAttribute('name','search');
-radioInput2.setAttribute('id','languageSearch');
-radioInput2.setAttribute('value','language');
-radioInput2.setAttribute('onclick','handle(value)');
-div5.append(radioInput2);
+div.appendChild(languageRegion);
+div.appendChild(languageLabel);
 
-let label2=document.createElement('label');
-label2.innerHTML='By Language';
-label2.setAttribute('for','languageSearch');
-label2.setAttribute('class','language');
-div5.append(label2);
+ //Search query field
+const searchQuery = document.createElement('label');
+searchQuery.innerHTML = ' <br/>Please Chose search query:';
+form.appendChild(searchQuery);
 
-let br2=document.createElement('br');
-div5.append(br2);
+const select = document.createElement('select');
+select.disabled = true;
+select.id = 'select';
+select.appendChild(document.createElement('option')).textContent =
+  'Select value';
+form.appendChild(select);
+const div1=document.createElement('div');
+div1.id='tableId';
+form.appendChild(div1);
 
-let div4=document.createElement('div');
-div4.setAttribute('class','language-picker');
-div2.append(div4);
 
-let para2=document.createElement('p');
-para2.innerHTML='Please choose search query:';
-div4.append(para2);
+const regionsList = externalService.getRegionsList();
+const languagesList = externalService.getLanguagesList();
 
-let select=document.createElement('select');
-select.setAttribute('name','');
-select.setAttribute('id','searchQuery');
-select.disabled=true;
-select.setAttribute('onchange','renderTable(this)');
-div4.append(select);
+const radioId1 = document.getElementById('region');
+const radioId2 = document.getElementById('language');
 
-let defaultOption=document.createElement('option');
-defaultOption.setAttribute('value','');
-defaultOption.innerHTML='Select value';
-select.append(defaultOption);
 
-let br3=document.createElement('br');
-div1.append(br3);
+// sorting country in increasing order 
+function countryIncreasing(){
 
-let MainTable=document.createElement('table');
-MainTable.setAttribute('id','table');
-MainTable.setAttribute('border','1');
-appRoot.append(MainTable);
+          let table, i, x, y;
+          table = document.getElementById('table2');
+          let switching = true;
 
-function clearTable(){
-    while(MainTable.lastElementChild){
-        MainTable.removeChild(MainTable.lastElementChild);
-    }
+          while (switching) {
+            switching = false;
+            let rows = table.rows;
+            let shouldSwitch;
+          
+            for (i = 1; i < rows.length - 1; i++) {
+              shouldSwitch = false;
+
+              x = rows[i].getElementsByTagName('TD')[0];
+              y = rows[i + 1].getElementsByTagName('TD')[0];
+
+              if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+
+                shouldSwitch = true;
+                break;
+              }
+            }
+            if (shouldSwitch) {
+              rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+              switching = true;
+            }
+          }
+
 }
 
-let tableHeaders='';
-function makeHeader(){
-    tableHeaders=`<tr>
-    <th><p>Country Name <span style="cursor:pointer" onClick="sortDependOnArrow(this)" id="name">${
-        sortFlags.name==='ascending'?'&#8593;':'&#8595;'
-    }</span></p></th>
-    <th>Capital</th>
-    <th>World Region</th>
-    <th>Languages</th>
-    <th>Area <span style="cursor:pointer" onClick="sortDependOnArrow(this)" id="area">${
-        sortFlags.area==='ascending'?'&#8593;':'&#8595;'
-    }</span></th>
-    <th>Flag</th>
-    </tr>`;
-}
 
-function handle(value){
+// sorting country in decreasing order 
+function countryDecreasing(){
 
-    let noItemPara=document.createElement('p');
-    clearTable();
-    noItemPara.setAttribute('id','noItemPara');
-    noItemPara.innerHTML='No items, please choose search query';
-    div1.append(noItemPara);
-    select.name=value;
-    value==='region'?fillSelect(externalService.getRegionsList()):fillSelect(externalService.getLanguagesList());
+        let table, i, x, y;
+        table = document.getElementById('table2');
+        let switching = true;
 
-    function fillSelect(arr){
-        let fragment = document.createDocumentFragment();
-        arr.forEach(element => {
-           let option=document.createElement('option');
-           option.textContent=element;
-           option.setAttribute('value',element);
-           fragment.appendChild(option);
-        });
 
-        while(select.lastElementChild){
-            select.removeChild(select.lastElementChild);
-        }
+        while (switching) {
+          switching = false;
+          let rows = table.rows;
+          let shouldSwitch;
+       
+          for (i = 1; i < rows.length - 1; i++) {
+            shouldSwitch = false;
 
-        select.appendChild(fragment);
-        select.disabled=false;
-    }
-}
-
-function renderTable(items){
-
-    if(document.getElementById('noItemPara')){
-        document.getElementById('noItemPara').remove(document.getElementById('noItemPara'));
-    }
     
-    select.name==='region'?renderItems(externalService.getCountryListByRegion(items.value))
-    :renderItems(externalService.getCountryListByLanguage(items.value));
-}
+            x = rows[i].getElementsByTagName('TD')[0];
+            y = rows[i + 1].getElementsByTagName('TD')[0];
 
-function renderItems(arr){
-    displayedItems=arr;
+            if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
 
-    let fragment=document.createDocumentFragment();
-    displayedItems.forEach(element => {
-        let tRow=document.createElement('tr');
-
-        let tRowCountry=document.createElement('td');
-        tRowCountry.textContent = element.name;
-
-        let tRowCapital=document.createElement('td');
-        tRowCapital.textContent=element.capital;
-
-        let tRowRegion=document.createElement('td');
-        tRowRegion.textContent=element.region;
-
-        let tRowLanguages=document.createElement('td');
-        tRowLanguages.textContent=Object.values(element.languages).reduce((acc,currValue) => {
-            return acc + ',' + currValue;
-        });
-
-        let tRowArea=document.createElement('td');
-        tRowArea.textContent=element.area;
-
-        let tRowFlag=document.createElement('td');
-        let flagImage=document.createElement('img');
-        tRowFlag.appendChild(flagImage);
-
-        tRow.append(tRowCountry,tRowCapital,tRowRegion,tRowLanguages,tRowArea,tRowFlag);
-        fragment.appendChild(tRow);
-    });
-
-    clearTable();
-    makeHeader();
-    MainTable.innerHTML=tableHeaders;
-    MainTable.appendChild(fragment);
-}
-
-let minusOne=-1;
-
-function sortDependOnArrow(el){
-    sort(el.id);
-    function sort(fieldName){
-        if(sortFlags[el.id]==='ascending'){
-            sortFlags[el.id]='descending';
-            displayedItems=displayedItems.sort((a,b) => {
-                if(a[fieldName]>b[fieldName]){
-                    return 1;
-                }else if(a[fieldName]===b[fieldName]){
-                    return 0;
-                }else{
-                    return minusOne;
-                }
-            });
-        }else{
-            sortFlags[el.id] = 'ascending';
-            displayedItems = displayedItems.sort((a, b) => {
-                if (a[fieldName] > b[fieldName]) {
-                    return minusOne;
-                } else if (a[fieldName] === b[fieldName]) {
-                    return 0;
-                } else {
-                    return 1;
-                }
-            });
+              shouldSwitch = true;
+              break;
+            }
+          }
+          if (shouldSwitch) {
+            rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+            switching = true;
+          }
         }
+
+}
+
+// sorting area in increasing order 
+function areaIncreasing(){
+ 
+          let table, i, x, y;
+          table = document.getElementById('table2');
+          let switching = true;
+
+          while (switching) {
+            switching = false;
+            let rows = table.rows;
+            let shouldSwitch;
+
+            for (i = 1; i < rows.length - 1; i++) {
+              shouldSwitch = false;
+ 
+              x = rows[i].getElementsByTagName('TD')[4];
+              y = rows[i + 1].getElementsByTagName('TD')[4];
+
+              if (Number(x.innerHTML) > Number(y.innerHTML)) {
+                shouldSwitch = true;
+                break;
+              }
+            }
+            if (shouldSwitch) {
+    
+              rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+              switching = true;
+            }
+          }
+        
+}
+
+
+// sorting area in decreasing order 
+function areaDecreasing(){
+
+  let table, i, x, y;
+  table = document.getElementById('table2');
+  let switching = true;
+
+  while (switching) {
+    switching = false;
+    let rows = table.rows;
+    let shouldSwitch;
+    for (i = 1; i < rows.length - 1; i++) {
+      shouldSwitch = false;
+      x = rows[i].getElementsByTagName('TD')[4];
+      y = rows[i + 1].getElementsByTagName('TD')[4];
+
+      if (Number(x.innerHTML) < Number(y.innerHTML)) {
+        shouldSwitch = true;
+        break;
+      }
+    }
+    if (shouldSwitch) {
+      rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+      switching = true;
+    }
+  }
+
+}
+
+
+//creating and updating table
+function tableUpdate(optionValue,radioValue){
+  const div11=document.getElementById('tableId');
+  div11.innerText='';
+  const table = document.createElement('table');
+  table.id = 'table2';
+  const tbody = document.createElement('tbody');
+  table.appendChild(tbody);
+  const tr = document.createElement('tr');
+  tbody.appendChild(tr);
+  const th = document.createElement('th');
+  th.innerHTML = 'Country name   <span class=" arrow" value="increasing">&#8593;</span>';
+  tr.appendChild(th);
+  const th2 = document.createElement('th');
+  th2.innerText = 'Capital';
+  tr.appendChild(th2);
+  const th3 = document.createElement('th');
+  th3.innerText = 'World Region';
+  tr.appendChild(th3);
+  const th4 = document.createElement('th');
+  th4.innerText = 'Languages';
+  th4.classList.add('languages');
+  tr.appendChild(th4);
+  const th5 = document.createElement('th');
+  th5.innerHTML ='Area <span class="upDownArrow arrowR" value="unsort">&#8597;</span>';
+  tr.appendChild(th5);
+  const th6 = document.createElement('th');
+  th6.innerHTML = 'Flag';
+  tr.appendChild(th6);
+  div1.appendChild(table);
+  const listByLanguage =
+    externalService.getCountryListByLanguage(optionValue);
+  const listByRegion=externalService.getCountryListByRegion(optionValue);
+  let lists;
+  if(radioValue==='region'){
+    lists=listByRegion;
+  }else if(radioValue==='language'){
+    lists=listByLanguage;
+  }
+  lists.forEach((countryDetail) => {
+    const tr1 = document.createElement('tr');
+    tr1.id='trow';
+    tbody.appendChild(tr1);
+    for (let i=0; i < 6; ++i) {
+
+      const td = document.createElement('td');
+      tr1.appendChild(td);
+      if (i === 0) {
+        td.innerHTML = countryDetail['name'];
+      } else if (i === 1) {
+        td.innerHTML = countryDetail['capital'];
+      } else if (i === 2) {
+        td.innerHTML = countryDetail['region'];
+      } else if (i === 3) {
+        const languages = countryDetail['languages'];
+        for (const lang in languages) {
+          if (true) {
+            const element = languages[lang];
+            td.innerHTML += `${element}, `;
+          }
+        }
+      } else if (i === 4) {
+        td.innerHTML = countryDetail['area'];
+      } else if (i === 5) {
+        const img = document.createElement('img');
+        const url =countryDetail['flagURL'];
+        img.src=`${url}`
+        td.appendChild(img);
+      }
     }
 
-    renderItems(displayedItems);
+  })
+  countryIncreasing();
+
+  const countryInc = document.querySelector('.arrow');
+let sort=countryInc.getAttribute('value');
+const areaInc = document.querySelector('.arrowR');
+  let sortA=areaInc.getAttribute('value');
+  countryInc.addEventListener('click',function(){
+    areaInc.innerHTML='&#8597;';
+    areaInc.setAttribute('value','unsort');
+    if(sort==='unsort'){
+      countryIncreasing();
+      countryInc.innerHTML='&#8593';
+    countryInc.setAttribute('value','increasing');
+    sort='increasing';
+    }else if(sort==='increasing'){
+
+      countryDecreasing();
+      countryInc.innerHTML='&#8595;'
+      countryInc.setAttribute('value','decreasing');
+      sort='decreasing';
+   }else if(sort==='decreasing'){
+    countryIncreasing()
+    countryInc.innerHTML='&#8593;'
+    countryInc.setAttribute('value','increasing');
+    sort='increasing';
+   }
+  })
+
+  areaInc.addEventListener('click',function(){
+    countryInc.innerHTML='&#8597;';
+    countryInc.setAttribute('value','unsort');
+    if(sortA==='unsort'){
+      areaIncreasing();
+      areaInc.innerHTML='&#8593';
+    areaInc.setAttribute('value','increasing');
+    sortA='increasing';
+    }else if(sortA==='increasing'){
+      areaDecreasing();
+      areaInc.innerHTML='&#8595';
+      areaInc.setAttribute('value','decreasing');
+      sortA='decreasing';
+   }else if(sortA==='decreasing'){
+    areaIncreasing()
+    areaInc.innerHTML='&#8593';
+    areaInc.setAttribute('value','increasing');
+    sortA='increasing';
+   }
+  })
+ 
 }
+
+const p = document.createElement('p');
+p.id='para1'
+p.innerText = '';
+p.innerText = 'No items, please choose search query';
+
+//selecting radio button
+const r=document.getElementById('radios');
+r.addEventListener('change',function(e){
+let radioValue=e.target.value;
+select.innerHTML = '';
+select.appendChild(document.createElement('option')).textContent ='Select value';
+  const selectElement = document.getElementById('select');
+if(radioValue==='region'){
+  regionsList.forEach((region) => {
+    const option = document.createElement('option');
+    option.value = region;
+    option.textContent = region;
+    select.appendChild(option);
+  });
+  if(selectElement.value==='Select value'){
+    const tableDiv = document.getElementById('tableId');
+      tableDiv.innerText = '';
+    p.innerText = 'No items, please choose search query';
+    form.appendChild(p)
+  }
+
+  selectElement.addEventListener('input', function (e) {
+    p.innerText='';
+    let optionValue = e.target.value;
+    // eslint-disable-next-line brace-style
+    tableUpdate(optionValue,radioValue) })
+}
+select.disabled = false;
+
+if(radioValue==='language'){
+  languagesList.forEach((language) => {
+    const option = document.createElement('option');
+    option.value = language;
+    option.textContent = language;
+    select.appendChild(option);
+  });
+  if(selectElement.value==='Select value'){
+    const tableDiv = document.getElementById('tableId');
+      tableDiv.innerText = '';
+    p.innerText = 'No items, please choose search query';
+    form.appendChild(p)
+  }
+  selectElement.addEventListener('input', function (e) {
+    p.innerText='';
+    let optionValue = e.target.value;
+    // eslint-disable-next-line brace-style
+    tableUpdate(optionValue,radioValue) })
+}
+select.disabled = false;
+})
+
+
