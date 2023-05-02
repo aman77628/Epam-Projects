@@ -1,0 +1,13 @@
+.fcontainer{
+    height: 40px;
+    margin-top: 50px;
+    background-color: black;
+    display: flex;
+    justify-content: space-around;
+    padding-left: 50px;
+}
+
+.fcontainer p{
+    color: #fff;
+    padding-top: 10px;
+}

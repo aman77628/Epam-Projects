@@ -1,0 +1,103 @@
+body{
+	margin:0 ;
+
+	font-family: sans-serif;
+
+}
+.container{
+  padding:20px;
+  background-color: #717375;
+}
+
+.blur{
+  filter: blur(2px);
+}
+
+*{
+	box-sizing: border-box;
+}
+
+.table{
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.table td,.table th{
+  padding:12px 15px;
+  border:1px solid #ddd;
+  text-align: center;
+  font-size:16px;
+}
+
+.table th{
+	background-color: #ef7cd8;
+	color:#ffffff;
+}
+
+.table tbody tr{
+	background-color: #f5f5f5;
+}
+
+.table tbody tr:hover{
+	background-color: #cecaca;
+}
+
+button {
+    padding: 8px 10px;
+    background-color: rgb(255, 255, 255);
+    color: rgb(0, 0, 0);
+    margin: 0.2rem;
+    font-size: 1rem;
+    border-radius: 8px;
+    border: 1px solid #fff;
+  }
+  button:hover {
+    box-shadow: 0 0.5em 0.5em -0.4em #d22121;
+  }
+  
+  .all {
+    color: #ffffff;
+    background-color: #c2e426;
+    border: 1px solid #00acee;
+  }
+  
+ .fail {
+    color: rgb(252, 252, 252);
+    border: 1px solid red;
+    background-color: red;
+  }
+  
+ .pass {
+    color: rgb(255, 255, 255);
+    background-color: green;
+    border: 1px solid green;
+  }
+  .details{
+    background-color: #99232b;
+    color: #fff;
+  }
+  .statistic{
+    color: #eff1f2;
+    border: 1px solid #165c37;
+    background-color: #8b9b14;
+  }
+  
+.search{
+    height: 39px;
+    float: right;
+    margin-right: 20px;
+    border-radius: 8px;
+    width: 200px;
+}
+
+.top{
+    margin-bottom: 10px;
+}
+
+
+.active{
+  background-color: #7f8284 !important;
+  color: #fff;
+  text-transform: uppercase;
+}
+
